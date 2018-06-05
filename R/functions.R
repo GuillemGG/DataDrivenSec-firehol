@@ -1,5 +1,5 @@
 
-#' Title GetDataFrame
+#' GetDataFrame
 #'
 #' @param still on development
 #'
@@ -91,7 +91,6 @@ tidyDataCountries <- function(working.directory) {
     tmp2$country <- rep(x = country, nrow(tmp2))
     countries <- rbind(countries,tmp2)
   }
-  return countries()
 }
 
 #' A l'introduir una IP mostra el dataset dels atacs que ha rebut
