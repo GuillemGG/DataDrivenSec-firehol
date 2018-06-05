@@ -1,12 +1,12 @@
-\name{hello}
-\alias{hello}
-\title{Hello, World!}
+\name{wst2}
+\alias{wst2}
+\title{wst2}
 \usage{
-hello()
+wst2()
 }
 \description{
-Prints 'Hello, world!'.
+Allows you to filter data in order to extract information
 }
 \examples{
-hello()
+wst2(country="ES")
 }
