@@ -4,8 +4,12 @@ Title: Search a host IP to check wether it's been under any campaing (malware, b
 Version: 1.0.0
 Author: Pol S., Guillem G., Jeffrey M.
 Maintainer: The package maintainer will be <solapol94@gmail.com>
-Description: This package can be used in many enviroments where the analyst need more information about a given IP.
-    Will allow you to query a huge amount the data withing seconds since all is collected/build at first to later on be able to query it.
+Description: This package can be used in many environments where the analyst needs more information about a given IP.
+  Will allow you to carry a huge amount the data within seconds for all is collected/build at first to later on be able to use it.
+  We are using a main and unique DataSource (since for this project will be enough) called firehol where we extract the data.
+  In case you have not installed github we highly recommend using source_downloader. ps1 to do it automatically with powershell.
+  If you need more DataSource let our developer team know what you are looking for at the same email as the maintainer.
+  The package is still in development and many improves are on the way.
 License: GPL-2
 Encoding: UTF-8
 Imports:
