@@ -18,7 +18,7 @@ library(DataDrivenSecFirehol)
 ```
 
 
-Search the Thread with *wst2()*
+Threat intel based on firehol's IP lists
 =============================
 
 Descargamos y descomprimimos los holes.... tarda un ratico...
