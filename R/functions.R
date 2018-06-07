@@ -21,48 +21,55 @@ getDataFrame <- function() {
 #'
 #' @param save.path
 #'
-#' @return
 #' @export
 #'
 #' @examples
 downloadFireHolData <- function(save.path = tempdir()) {
-  # download.file()
+  download.file(url = "https://github.com/firehol/blocklist-ipsets/archive/master.zip",
+                destfile = paste(save.path, "\\", "master.zip", sep = ""))
+  utils::unzip(zipfile = paste(save.path, "\\", "master.zip", sep = ""),
+               exdir = paste(save.path, "\\", "data", sep = ""))
   print("Data downloaded") #Fake by now. Has to be done manually.
+  return(paste(save.path, "\\", "data", sep = ""))
 }
 
 
 #' Tidying IP dataset
 #'
-#' @param
+#' @param working.directory
 #'
 #' @return
 #' @export
 #'
 #' @examples
-tidyDataIPs <- function(working.directory) {
-  setwd(working.directory)
-  src.files <- list.files() # LLEGIR FITXERS DEL WORKING DIRECTORY
-  IPS <- NULL
+tidyDataIPs <- function(raw.path) {
+  src.files <- list.files(path = raw.path, pattern = ".ipset")
+  ips <- data.frame(ip = character(),
+                    categ = character(),
+                    stringsAsFactors = F)
 
-  for (file_name in src.files){
-    tmp <- read.table(file = paste(working.directory, file_name, sep = "\\"), skipNul = T,
+  # file_name <- src.files[1]
+  for (file_name in src.files[1:30]){
+    tmp <- read.table(file = paste(raw.path, file_name, sep = ""), skipNul = T,
                       col.names = c("ip"), na.strings = "NULL", stringsAsFactors = F)
-    file_info <- read.table(file=file_name, comment.char="/", sep = "\t", stringsAsFactors = F,nrows=50 )
-    categ <- dplyr::filter(file_info, stringr::str_detect(V1,"Category"))
-    if(nrow(categ) > 0) {
-      categ <- stringr::str_trim(stringr::str_split(categ$V1, ":")[[1]][2])
-      tmp$categ <- rep(x = categ, nrow(tmp))
-      print(file_name)
-      IPS <- rbind(IPS, tmp)
+    if (nrow(tmp) > 0) {
+      file_info <- read.table(file = paste(raw.path, file_name, sep = ""),
+                              comment.char="/", sep = "\t", stringsAsFactors = F, nrows=50 )
+      categ <- dplyr::filter(file_info, stringr::str_detect(V1,"Category"))
+      if(nrow(categ) > 0) {
+        categ <- stringr::str_trim(stringr::str_split(categ$V1, ":")[[1]][2])
+        tmp$categ <- rep(x = categ, nrow(tmp))
+        ips <- rbind(ips, tmp)
+      }
     }
   }
-  return()
+  return(ips)
 }
 
 
 #' Tidying Countries dataset
 #'
-#' @param
+#' @param working.directory
 #'
 #' @return
 #' @export
@@ -70,18 +77,27 @@ tidyDataIPs <- function(working.directory) {
 #' @examples
 tidyDataCountries <- function(working.directory) {
   setwd(working.directory) # WORKING DIRECTORY
+  # raw.path <- "data/geolite2_country/"
+
   src.files <- list.files()
   countries <- NULL
 
   for (file_name in src.files){
-    file_info <- read.table(file=file_name, comment.char="/", sep = "\t", stringsAsFactors = F,nrows=50, row.names = NULL)
+    file_info <- read.table(file = paste(raw.path, file_name, sep = ""),
+                            comment.char="/", sep = "\t", stringsAsFactors = F,
+                            nrows = 50, row.names = NULL)
     country_tmp <- dplyr::filter(file_info, stringr::str_detect(V1,"--"))
-    tmp2 <- read.table(file = paste(working.directory,file_name,
-                                    sep = "\\"),skipNul = T, na.strings = "NULL", col.names = c("range"), stringsAsFactors = F, row.names= NULL)
+    tmp2 <- read.table(file = paste(raw.path, file_name, sep = ""),
+                       skipNul = T, na.strings = "NULL", col.names = c("range"),
+                       stringsAsFactors = F, row.names= NULL)
+
+    sonip <- tmp2[sapply(tmp2$range, iptools::is_ipv4),]
+    nosonip <- tmp2[!sapply(tmp2$range, iptools::is_ipv4),]
+
     for (ip in tmp2) {
-      tmp_boundary <- range_boundaries(ip)
-      tmp2$min <- tmp_boundary[1]
-      tmp2$max <- tmp_boundary[2]
+      tmp_boundary <- iptools::range_boundaries(ip)
+      tmp2$min <- tmp_boundary[1]$minimum_ip
+      tmp2$max <- tmp_boundary[2]$maximum_ip
     }
     if(nrow(country_tmp) > 0) {
       country <- stringr::str_trim(stringr::str_split(country_tmp$V1, "#")[[1]][2])
@@ -94,17 +110,7 @@ tidyDataCountries <- function(working.directory) {
   return()
 }
 
-#' A l'introduir una IP mostra el dataset dels atacs que ha rebut
-#' classificada pel tipus de campanya i país
-#'
-#' @param df
-#' @param ip
-#'
-#' @return dataset
-#' @export
-#'
-#' @examples
-#' IPsRecount <- list.ip.count(IPS, '5.188.86.174')
+
 list.ip.count <- function(df, ip){
   mydf <- (as.data.frame(table(df[1])))
   mytable <- table(df[1])
@@ -116,9 +122,6 @@ list.ip.count <- function(df, ip){
 
   dplyr::filter(file_info, stringr::str_detect(V1,"--"))
 }
-
-IPsRecount <- list.ip.count(IPS, '5.188.86.174')
-
 
 #' Mostra totes les categories que hi ha registrades
 #'
@@ -138,8 +141,7 @@ list.category <- function(df){
 #'
 #' @param df
 #'
-#' @return
-#' @export dataset
+#' @export
 #'
 #' @examples
 #' CategoriesCount <- list.category.count(IPS)
@@ -152,7 +154,6 @@ list.category.count <- function(df){
 #'
 #' @param df
 #'
-#' @return list
 #' @export
 #'
 #' @examples
@@ -166,7 +167,6 @@ list.country <- function(df){
 #'
 #' @param df
 #'
-#' @return dataset
 #' @export
 #'
 #' @examples

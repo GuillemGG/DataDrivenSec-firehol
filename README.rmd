@@ -1,6 +1,6 @@
 ---
 title: "Thread Analisys"
-author: "J.P.G."
+author: "J.P.G. (Jodidos Por Guillem)"
 date: "Summer 2018"
 output:
   html_document:
@@ -13,64 +13,23 @@ output:
     toc_float: no
 ---
 
+```{r}
+library(DataDrivenSecFirehol)
+```
+
+
 Search the Thread with *wst2()*
 =============================
 
+Descargamos y descomprimimos los holes.... tarda un ratico...
+```{r}
+path.raw.data <- DataDrivenSecFirehol::downloadFireHolData()
+```
+El contendio esta en `r path.raw.data` ordenado... bla bla bla 
 
-<h3 style="color:grey">Description</h3>
-<p>
-This package is ment to be used as in a SOC environment since it will allow you to search if an IP that you might have been detected is part of another network that perform another attacks. From the package itself you will be able to query IPs, Locations and what Kind of category it belongs to.
-</p>
+Y ahora vamos a parsear los archivos para generar un bonico data frame.
 
-<h3 style="color:grey">Usage</h3>
-  <div>
-  <code>wst2.list.country()</code><br>
-  <code>wst2.list.category()</code><br>
-  <code>wst2(country = "", category = "", host = "", ORDER = , COUNT = TRUE/FALSE)</code>
-  </div>
+```{r}
+df <- DataDrivenSecFirehol::tidyDataIPs(raw.path = path.raw.data)
+```
 
-<h3 style="color:grey">Arguments</h3>
-
-<table style="text-align:center; height: 50%; border-color: black; width: 70%;" border="1">
-<tbody>
-<tr>
-<td style="width: 10%; background-color:lightgreen">Arguments</td>
-<td style="width: 10%; background-color:lightgreen">Example</td>
-<td style="width: 60%; background-color:lightgreen">Description</td>
-</tr>
-<tr>
-<td style="width: 10%;">country</td>
-<td style="width: 10%;">wst2(country="ES")</td>
-<td style="width: 60%;">Let you choose the country to search for. List the countries executing:<code>wst2.list.country()</code>.</td>
-</tr>
-<tr>
-<td style="width: 10%;">host</td>
-<td style="width: 10%;">wst2(host='115.202.230.210')</td>
-<td style="width: 60%;">You can choose a known IP and search information about it which will print you from different categories that matched *if any*.</td>
-</tr>
-<tr>
-<td style="width: 10%;">category</td>
-<td style="width: 10%;">wst2(category="malware")</td>
-<td style="width: 60%;">Choose a category and print all the matching IPs with that category. List the categories executing:<code>wst2.list.category()</code>.</td>
-</tr>
-<tr>
-<td style="width: 10%;">SORT</td>
-<td style="width: 10%;">wst2(SORT="category")</td>
-<td style="width: 60%;">Sort from a chosen collumn</td>
-</tbody>
-</table>
-  
-  
-<h3 style="color:grey">Details and Requirements</h3>
-  * Install rmarkdown and tidyr package
-    * install.packages("rmarkdown")
-    * install.packages("tidyr")
-  * Execution of the script <a href="https://github.com/Poletee/Practica-DDS/blob/master/source_downloader.ps1">source_downloader.ps1</a> to get the lastest data.
-  * Internet Connection to upgrade the sources and query the service ( When implemented [v.1.5] ).
-
-  
-<h3 style="color:grey">Example</h3>
-  <p> TRY IT: </p>
-  <code>wst2(category = "anonymizers", host = "115.202.230.210")</code>
-
-<footer>[ Package beta version 1.0.0 JPG]</footer>
