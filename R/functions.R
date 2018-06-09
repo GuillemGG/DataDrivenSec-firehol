@@ -111,67 +111,84 @@ tidyDataCountries <- function(working.directory) {
 }
 
 
-list.ip.count <- function(df, ip){
-  mydf <- (as.data.frame(table(df[1])))
-  mytable <- table(df[1])
-  #t <- table(df[1])
-  #print(which(mydf == ip))
-  #print(mydf[957])
-  print(dplyr::filter(str_detect(mytable, ip)))
-  print(mytable[mytable[,1]==ip,1])
+#' A l'introduir una IP retorna la quantitat d'atacs rebuts
+#'
+#' @param ip
+#'
+#' @return dataset
+#' @export
+#'
+#' @examples
+#' IPsRecount <- list.ip.count('5.188.86.174')
+list.ip.count <- function(ip){
+  IPsFound <- IPS[IPS$ip == ip,]
 
-  dplyr::filter(file_info, stringr::str_detect(V1,"--"))
+  return(sum(duplicated(IPsFound$ip)) + 1)
 }
 
-#' Mostra totes les categories que hi ha registrades
+#' A l'introduir una IP mostra el dataset dels atacs que ha rebut
+#' classificada pel tipus de campanya i pais
 #'
-#' @param df
+#' @param ip
+#'
+#' @return dataset
+#' @export
+#'
+#' @examples
+#' IPRelatedDataset <- list.iprelated.dataset('5.188.86.174')
+list.iprelated.dataset <- function(ip){
+  IPsFound <- IPS[IPS$ip == ip,]
+
+  count <- plyr::count(IPsFound)
+  colnames(count)[4] <- "appearances"
+  return(count)
+}
+
+
+#' Mostra totes les categories que hi ha registrades
 #'
 #' @return list
 #' @export
 #'
 #' @examples
-#' ListCategories <- list.category(IPS)
-list.category <- function(df){
-  print (dplyr::distinct(df[2]))
+#' ListCategories <- list.category()
+list.category <- function(){
+  return(dplyr::distinct(IPS[2]))
 }
 
-
+ListCategories <- list.category()
 #' Retorna un dataset de quants atacs per categoria hi ha registrats
 #'
-#' @param df
-#'
-#' @export
+#' @return
+#' @export dataset
 #'
 #' @examples
-#' CategoriesCount <- list.category.count(IPS)
-list.category.count <- function(df){
-  print(as.data.frame(table(df[2])))
+#' CategoriesCount <- list.category.count()
+list.category.count <- function(){
+  return(as.data.frame(table(IPS[2])))
 }
 
 
-#' Retorna un llistat dels països que tenen IPs que han sigut víctimes d'atacs
+#' Retorna un llistat dels paÃ¯sos que tenen IPs que han sigut vÃ­ctimes d'atacs
 #'
-#' @param df
-#'
+#' @return list
 #' @export
 #'
 #' @examples
-#' ListCountries <- list.country(IPS)
-list.country <- function(df){
-  print (dplyr::distinct(df[3]))
+#' ListCountries <- list.country()
+list.country <- function(){
+  return (dplyr::distinct(IPS[3]))
 }
 
 
-#' Retorna un dataset de quants atacs per país hi ha registrats
+#' Retorna un dataset de quants atacs per paÃ­s hi ha registrats
 #'
-#' @param df
-#'
+#' @return dataset
 #' @export
 #'
 #' @examples
 #' list.category.count(IPS)
-list.country.count <- function(df){
-  print (table(df[3]))
+list.country.count <- function(){
+  return (table(IPS[3]))
 }
 
