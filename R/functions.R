@@ -169,7 +169,7 @@ list.category.count <- function(){
 }
 
 
-#' Retorna un llistat dels paÃ¯sos que tenen IPs que han sigut vÃ­ctimes d'atacs
+#' Retorna un llistat dels països que tenen IPs que han sigut víctimes d'atacs
 #'
 #' @return list
 #' @export
@@ -181,7 +181,7 @@ list.country <- function(){
 }
 
 
-#' Retorna un dataset de quants atacs per paÃ­s hi ha registrats
+#' Retorna un dataset de quants atacs per país hi ha registrats
 #'
 #' @return dataset
 #' @export
