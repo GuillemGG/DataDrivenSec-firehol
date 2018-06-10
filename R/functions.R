@@ -29,12 +29,12 @@ downloadFireHolData <- function(save.path = tempdir()) {
                 destfile = paste(save.path, "\\", "master.zip", sep = ""))
   utils::unzip(zipfile = paste(save.path, "\\", "master.zip", sep = ""),
                exdir = paste(save.path, "\\", "data", sep = ""))
-  print("Data downloaded") #Fake by now. Has to be done manually.
+  #TODO: ELIMINAR FITXERS CONTINENT DINS DE GEOIP2 I QUADRAR PATHS
   return(paste(save.path, "\\", "data", sep = ""))
 }
 
 
-#' Tidying IP dataset
+#' This function creates a data frame with all the malicious IPs from the downloaded sources
 #'
 #' @param working.directory
 #'
@@ -49,7 +49,7 @@ tidyDataIPs <- function(raw.path) {
                     stringsAsFactors = F)
 
   # file_name <- src.files[1]
-  for (file_name in src.files[1:30]){
+  for (file_name in src.files){
     tmp <- read.table(file = paste(raw.path, file_name, sep = ""), skipNul = T,
                       col.names = c("ip"), na.strings = "NULL", stringsAsFactors = F)
     if (nrow(tmp) > 0) {
@@ -67,7 +67,7 @@ tidyDataIPs <- function(raw.path) {
 }
 
 
-#' Tidying Countries dataset
+#' This method collects data from the downloaded source and creates a data frame matching IP ranges and countries.
 #'
 #' @param working.directory
 #'
@@ -75,11 +75,10 @@ tidyDataIPs <- function(raw.path) {
 #' @export
 #'
 #' @examples
-tidyDataCountries <- function(working.directory) {
-  setwd(working.directory) # WORKING DIRECTORY
+tidyDataCountries <- function(raw.path) {
   # raw.path <- "data/geolite2_country/"
 
-  src.files <- list.files()
+  src.files <- list.files(path = raw.path, pattern = ".netset")
   countries <- NULL
 
   for (file_name in src.files){
@@ -91,8 +90,8 @@ tidyDataCountries <- function(working.directory) {
                        skipNul = T, na.strings = "NULL", col.names = c("range"),
                        stringsAsFactors = F, row.names= NULL)
 
-    sonip <- tmp2[sapply(tmp2$range, iptools::is_ipv4),]
-    nosonip <- tmp2[!sapply(tmp2$range, iptools::is_ipv4),]
+    #sonip <- tmp2[sapply(tmp2$range, iptools::is_ipv4),]
+    #nosonip <- tmp2[!sapply(tmp2$range, iptools::is_ipv4),]
 
     for (ip in tmp2) {
       tmp_boundary <- iptools::range_boundaries(ip)
@@ -102,12 +101,24 @@ tidyDataCountries <- function(working.directory) {
     if(nrow(country_tmp) > 0) {
       country <- stringr::str_trim(stringr::str_split(country_tmp$V1, "#")[[1]][2])
       country <- stringr::str_trim(stringr::str_split(country, ",")[[1]][1])
-      print(file_name)
     }
     tmp2$country <- rep(x = country, nrow(tmp2))
     countries <- rbind(countries,tmp2)
   }
-  return()
+  return(countries)
+}
+
+#' This function merges the 2 dataframes in order to apply the location from countries to each IP from ips
+#'
+#' @param ips
+#' @param countries
+#'
+#' @return final_ips
+#' @export
+#'
+#' @examples
+mergeDFs <- function(ips,countries){
+  return(final_ips)
 }
 
 
@@ -147,29 +158,34 @@ list.iprelated.dataset <- function(ip){
 
 #' Mostra totes les categories que hi ha registrades
 #'
+#'@param IPS
+#'
 #' @return list
 #' @export
 #'
 #' @examples
 #' ListCategories <- list.category()
-list.category <- function(){
+list.category <- function(IPS){
   return(dplyr::distinct(IPS[2]))
 }
 
-ListCategories <- list.category()
 #' Retorna un dataset de quants atacs per categoria hi ha registrats
+#'
+#' @param IPS
 #'
 #' @return
 #' @export dataset
 #'
 #' @examples
 #' CategoriesCount <- list.category.count()
-list.category.count <- function(){
+list.category.count <- function(IPS){
   return(as.data.frame(table(IPS[2])))
 }
 
 
 #' Retorna un llistat dels països que tenen IPs que han sigut víctimes d'atacs
+#'
+#' @param IPS
 #'
 #' @return list
 #' @export
@@ -183,12 +199,14 @@ list.country <- function(){
 
 #' Retorna un dataset de quants atacs per país hi ha registrats
 #'
+#' @param IPS
+#'
 #' @return dataset
 #' @export
 #'
 #' @examples
 #' list.category.count(IPS)
-list.country.count <- function(){
+list.country.count <- function(IPS){
   return (table(IPS[3]))
 }
 
