@@ -53,8 +53,8 @@ tidyDataIPs <- function(raw.path) {
     tmp <- read.table(file = paste(raw.path, file_name, sep = ""), skipNul = T,
                       col.names = c("ip"), na.strings = "NULL", stringsAsFactors = F)
     if (nrow(tmp) > 0) {
-      file_info <- read.table(file = paste(raw.path, file_name, sep = ""),
-                              comment.char="/", sep = "\t", stringsAsFactors = F, nrows=50 )
+      file_info <- read.table(file = paste(dfd, file_name, sep = ""),
+                              comment.char="/", sep = "\t", quote = "", stringsAsFactors = F, nrows=50 )
       categ <- dplyr::filter(file_info, stringr::str_detect(V1,"Category"))
       if(nrow(categ) > 0) {
         categ <- stringr::str_trim(stringr::str_split(categ$V1, ":")[[1]][2])
