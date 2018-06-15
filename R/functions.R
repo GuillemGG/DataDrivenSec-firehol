@@ -1,7 +1,7 @@
 
 #' GetDataFrame
 #'
-#' @param still on development
+#'
 #'
 #' @return dataset
 #' @export
