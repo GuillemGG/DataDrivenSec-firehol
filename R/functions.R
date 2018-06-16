@@ -173,8 +173,9 @@ list.category <- function(IPS){
 #'
 #' @param IPS
 #'
-#' @return
-#' @export dataset
+#' @return dataset
+#' @export
+#'
 #'
 #' @examples
 #' CategoriesCount <- list.category.count()
