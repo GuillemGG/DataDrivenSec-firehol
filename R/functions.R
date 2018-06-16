@@ -46,6 +46,7 @@ tidyDataIPs <- function(raw.path) {
   src.files <- list.files(path = raw.path, pattern = ".ipset")
   ips <- data.frame(ip = character(),
                     categ = character(),
+                    country = character(),
                     stringsAsFactors = F)
 
   # file_name <- src.files[1]
@@ -53,7 +54,7 @@ tidyDataIPs <- function(raw.path) {
     tmp <- read.table(file = paste(raw.path, file_name, sep = ""), skipNul = T,
                       col.names = c("ip"), na.strings = "NULL", stringsAsFactors = F)
     if (nrow(tmp) > 0) {
-      file_info <- read.table(file = paste(dfd, file_name, sep = ""),
+      file_info <- read.table(file = paste(raw.path, file_name, sep = ""),
                               comment.char="/", sep = "\t", quote = "", stringsAsFactors = F, nrows=50 )
       categ <- dplyr::filter(file_info, stringr::str_detect(V1,"Category"))
       if(nrow(categ) > 0) {
@@ -118,7 +119,9 @@ tidyDataCountries <- function(raw.path) {
 #'
 #' @examples
 mergeDFs <- function(ips,countries){
-  return(final_ips)
+
+
+  return(df_final)
 }
 
 
