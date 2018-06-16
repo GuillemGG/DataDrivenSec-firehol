@@ -25,11 +25,26 @@ Descargamos y descomprimimos los holes.... tarda un ratico...
 ```{r}
 path.raw.data <- DataDrivenSecFirehol::downloadFireHolData()
 ```
-El contendio esta en `r path.raw.data` ordenado... bla bla bla 
+El contendio esta en `r path.raw.data`. Es un fichero temporal que se eliminará cuando cierres la sesión.
 
-Y ahora vamos a parsear los archivos para generar un bonico data frame.
+A continuación, vamos a proceder a parsear los datos anteriores y a generar el data frame ordenado. 
 
 ```{r}
 df <- DataDrivenSecFirehol::tidyDataIPs(raw.path = path.raw.data)
 ```
 
+Ya tenemos las IPs parseadas, ahora es el turno de la localización por IPs usando la base de datos de maxmind.
+
+```{r}
+df2 <- DataDrivenSecFirehol::tidyDataCountries(raw.path = path.raw.data)
+```
+
+Una vez tenemos los dos data frames construidos y a punto, procedemos a fusionarlos para tener todo el contenido en un mismo dataframe.
+
+```{r}
+df_final <- DataDrivenSecFirehol::mergeDFs(df,df2)
+```
+
+Ahora, os aconsejo probar algunos ejemplos como los de continuación:
+
+JEFFREY COMPLETA PLIS...
