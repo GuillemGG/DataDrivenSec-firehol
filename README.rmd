@@ -1,6 +1,6 @@
 ---
 title: "Thread Analisys"
-author: "J.P.G. (Jodidos Por Guillem)"
+author: "J.P.G."
 date: "Summer 2018"
 output:
   html_document:
