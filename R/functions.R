@@ -123,25 +123,24 @@ tidyDataCountries <- function(raw.path) {
 #' @examples
 mergeDFs <- function(df,df2){
 
-  for (ip in df){
+  for (i in nrow(df)){
+    ip <- df[1][i]
     isv4 <- iptools::is_ipv4(ip)
     if (isv4 == TRUE){
-      for(rango in df2$range){
-        if (df2$min != "Invalid"){
+      for(j in nrow(df2)){
+        rango <- df2[1][j]
+        if (df2[2][j] != "Invalid"){ #it is an ip +a mask
           if (iptools::ip_in_range(ip, rango)){
-            df$country = df2$country
+            df[3][i] = df2[4][j]
           }
         }
-        else {
-          if (ip == rango) df$country = df2$country
+        else { # compare IPs
+          if (ip == rango) df[3][i] = df2[4][j]
         }
       }
-    } else {
-      df$country = "Unknown"
     }
   }
-
-  return(df$country)
+  return(df)
 }
 
 
