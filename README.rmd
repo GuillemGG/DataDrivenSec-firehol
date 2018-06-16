@@ -24,6 +24,8 @@ Threat intel based on firehol's IP lists
 Descargamos y descomprimimos los datos de Firehol, este proceso puede tardar un poco.
 ```{r}
 path.raw.data <- DataDrivenSecFirehol::downloadFireHolData()
+path.raw.data <- paste(path.raw.data, "blocklist-ipsets-master", sep="\\")
+path.raw.data <- paste(path.raw.data, "\\", sep="")
 ```
 El contenido está en `r path.raw.data`. Es un fichero temporal que se eliminará cuando cierres la sesión.
 
@@ -33,7 +35,8 @@ A continuación, vamos a proceder a parsear los datos anteriores y a generar el 
 df <- DataDrivenSecFirehol::tidyDataIPs(raw.path = path.raw.data)
 ```
 
-Ya tenemos las IPs parseadas, ahora es el turno de la localización por IPs usando la base de datos de maxmind.
+Ya tenemos las IPs parseadas, ahora es el turno de la localización por IPs usando la base de datos de maxmind. Primero, debes eliminar los ficheros de IPs de continentes para no tener duplicados y obtener solo la de los países.
+TODO: eliminar esos ficheros al descargarlos
 
 ```{r}
 df2 <- DataDrivenSecFirehol::tidyDataCountries(raw.path = path.raw.data)

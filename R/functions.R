@@ -64,6 +64,7 @@ tidyDataIPs <- function(raw.path) {
       }
     }
   }
+  ips$country <- rep(x = " ", nrow(ips))
   return(ips)
 }
 
@@ -78,7 +79,9 @@ tidyDataIPs <- function(raw.path) {
 #' @examples
 tidyDataCountries <- function(raw.path) {
   # raw.path <- "data/geolite2_country/"
-
+  raw.path <- paste(path.raw.data, "geolite2_country", sep="")
+  raw.path <- paste(raw.path, "\\", sep="")
+  #TODO: S'HA D'ELIMINAR ELS FITXERS CONTINENT I ANONYMOUS.
   src.files <- list.files(path = raw.path, pattern = ".netset")
   countries <- NULL
 
