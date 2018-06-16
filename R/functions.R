@@ -38,7 +38,7 @@ downloadFireHolData <- function(save.path = tempdir()) {
 #'
 #' @param working.directory
 #'
-#' @return
+#' @return ips
 #' @export
 #'
 #' @examples
@@ -73,7 +73,7 @@ tidyDataIPs <- function(raw.path) {
 #'
 #' @param working.directory
 #'
-#' @return
+#' @return countries
 #' @export
 #'
 #' @examples
@@ -121,10 +121,27 @@ tidyDataCountries <- function(raw.path) {
 #' @export
 #'
 #' @examples
-mergeDFs <- function(ips,countries){
+mergeDFs <- function(df,df2){
 
+  for (ip in df){
+    isv4 <- iptools::is_ipv4(ip)
+    if (isv4 == TRUE){
+      for(rango in df2$range){
+        if (df2$min != "Invalid"){
+          if (iptools::ip_in_range(ip, rango)){
+            df$country = df2$country
+          }
+        }
+        else {
+          if (ip == rango) df$country = df2$country
+        }
+      }
+    } else {
+      df$country = "Unknown"
+    }
+  }
 
-  return(df_final)
+  return(df$country)
 }
 
 
