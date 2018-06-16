@@ -21,11 +21,11 @@ library(DataDrivenSecFirehol)
 Threat intel based on firehol's IP lists
 =============================
 
-Descargamos y descomprimimos los holes.... tarda un ratico...
+Descargamos y descomprimimos los datos de Firehol, este proceso puede tardar un poco.
 ```{r}
 path.raw.data <- DataDrivenSecFirehol::downloadFireHolData()
 ```
-El contendio esta en `r path.raw.data`. Es un fichero temporal que se eliminará cuando cierres la sesión.
+El contenido está en `r path.raw.data`. Es un fichero temporal que se eliminará cuando cierres la sesión.
 
 A continuación, vamos a proceder a parsear los datos anteriores y a generar el data frame ordenado. 
 
