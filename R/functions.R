@@ -112,13 +112,63 @@ tidyDataCountries <- function(raw.path) {
   return(countries)
 }
 
+#' Internal function used to look for the correct country
+#'
+#' @param rango
+#' @param df2
+#'
+#' @return
+#' @export
+#'
+#' @examples
+look_countries2 <- function(df2, df_row){
+  temp <- iptools::ip_in_range(rango, df2[1])
+  if(test){
+    print(rango)
+    print(df2)
+  }
+}
+
+#' Internal function used to look for the correct country
+#'
+#' @param rango
+#' @param df2
+#'
+#' @return
+#' @export
+#'
+#' @examples
+look_countries <- function(df2, df_row){
+  temp <- iptools::ip_in_range(df_row[1], df2[1])
+  if (temp){
+    return(df[4])
+  }else {
+    return(FALSE)
+  }
+}
+
 #' Internal function used to get each row in the IPS df
+#' @param df
+#' @param df2
 #'
 #' @return df
+#' @export
 #'
-#'
-ips_merge <- function(df,df2){
-
+ips_merge <- function(df_row,df2){
+  country <- NULL
+  if(iptools::is_ipv4(df_row[1])){
+    tmp <- apply(df2, 1, look_countries,df_row) #look for an IPv4
+    if(tmp != FALSE){
+      df_row[[3]] <- tmp
+    }
+  }
+  else {
+    tmp <- apply(df2, 1, look_countries2,df_row) #look for ranges
+    if(tmp != FALSE){
+      df_row[[3]] <- tmp
+    }
+  }
+  return(country)
 }
 
 #' This function merges the 2 dataframes in order to apply the location from countries' data frame to each IP from IPs.
@@ -132,8 +182,8 @@ ips_merge <- function(df,df2){
 #'
 #' @examples
 mergeDFs2 <- function (df,df2){
-  apply(df,1,ips_merge,df2)
-  return(df)
+  final_df <- apply(df,1,ips_merge,df2)
+  return(final_df)
 }
 
 #' This function merges the 2 dataframes in order to apply the location from countries to each IP from ips
