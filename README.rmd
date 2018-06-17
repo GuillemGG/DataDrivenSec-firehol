@@ -45,7 +45,7 @@ df2 <- DataDrivenSecFirehol::tidyDataCountries(raw.path = path.raw.data)
 Una vez tenemos los dos data frames construidos y a punto, procedemos a fusionarlos para tener todo el contenido en un mismo dataframe.
 
 ```{r}
-df_final <- DataDrivenSecFirehol::mergeDFs(df,df2)
+df_final <- DataDrivenSecFirehol::mergeDFs2(df,df2)
 ```
 
 Ahora, os aconsejo probar algunos ejemplos como los de continuación:

@@ -112,6 +112,30 @@ tidyDataCountries <- function(raw.path) {
   return(countries)
 }
 
+#' Internal function used to get each row in the IPS df
+#'
+#' @return df
+#'
+#'
+ips_merge <- function(df,df2){
+
+}
+
+#' This function merges the 2 dataframes in order to apply the location from countries' data frame to each IP from IPs.
+#' This version uses the apply function cos am not able to get it working.
+#'
+#' @param df
+#' @param df2
+#'
+#' @return
+#' @export
+#'
+#' @examples
+mergeDFs2 <- function (df,df2){
+  apply(df,1,ips_merge,df2)
+  return(df)
+}
+
 #' This function merges the 2 dataframes in order to apply the location from countries to each IP from ips
 #'
 #' @param ips
