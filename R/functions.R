@@ -144,7 +144,7 @@ look_countries <- function(df2, df_row){
   temp <- iptools::ip_in_range(df_row[1], df2[1])
   #print(temp)
   if (temp){
-    print("EUREKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+    #print("EUREKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
     return(df2[4])
   }else {
     return(FALSE)
@@ -162,7 +162,7 @@ ips_merge <- function(df_row,df2){
   if(iptools::is_ipv4(df_row[1])){
     for (i in 1:nrow(df2)) {
       df2_row <- df2[i,]
-      if(iptools::ip_in_range(df_row[1],df2_row[1])){
+      if(iptools::ip_in_range(df_row[[1]],df2_row[1])){
         #location found
         print(df2_row[4])
         df_row[3] <- df2_row[4]
