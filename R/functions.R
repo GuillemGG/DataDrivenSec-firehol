@@ -134,14 +134,18 @@ look_countries2 <- function(df2, df_row){
 #' @param rango
 #' @param df2
 #'
-#' @return
+#' @return country
 #' @export
 #'
 #' @examples
 look_countries <- function(df2, df_row){
+  print("okay, here's what I got:")
+  print(df2)
   temp <- iptools::ip_in_range(df_row[1], df2[1])
+  print(temp)
   if (temp){
-    return(df[4])
+    print("EUREKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+    return(df2[4])
   }else {
     return(FALSE)
   }
@@ -157,7 +161,10 @@ look_countries <- function(df2, df_row){
 ips_merge <- function(df_row,df2){
   country <- NULL
   if(iptools::is_ipv4(df_row[1])){
+    print("I'm on first if, gonna do look_countries")
+    print(df_row)
     tmp <- apply(df2, 1, look_countries,df_row) #look for an IPv4
+    print(tmp)
     if(tmp != FALSE){
       df_row[[3]] <- tmp
     }
