@@ -134,15 +134,15 @@ look_countries2 <- function(df2, df_row){
 #' @param rango
 #' @param df2
 #'
-#' @return country
+#' @return
 #' @export
 #'
 #' @examples
 look_countries <- function(df2, df_row){
-  print("okay, here's what I got:")
-  print(df2)
+  #print("okay, here's what I got:")
+  #print(df2)
   temp <- iptools::ip_in_range(df_row[1], df2[1])
-  print(temp)
+  #print(temp)
   if (temp){
     print("EUREKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
     return(df2[4])
@@ -155,27 +155,36 @@ look_countries <- function(df2, df_row){
 #' @param df
 #' @param df2
 #'
-#' @return df
+#'
 #' @export
 #'
 ips_merge <- function(df_row,df2){
-  country <- NULL
   if(iptools::is_ipv4(df_row[1])){
-    print("I'm on first if, gonna do look_countries")
-    print(df_row)
-    tmp <- apply(df2, 1, look_countries,df_row) #look for an IPv4
-    print(tmp)
-    if(tmp != FALSE){
-      df_row[[3]] <- tmp
+    for (i in 1:nrow(df2)) {
+      df2_row <- df2[i,]
+      if(iptools::ip_in_range(df_row[1],df2_row[1])){
+        #location found
+        print(df2_row[4])
+        df_row[3] <- df2_row[4]
+        break
+      }
     }
+  } else{
+    df_row[3] <- Unknown
   }
-  else {
-    tmp <- apply(df2, 1, look_countries2,df_row) #look for ranges
-    if(tmp != FALSE){
-      df_row[[3]] <- tmp
-    }
-  }
-  return(country)
+
+#  if(iptools::is_ipv4(df_row[1])){
+#    tmp <- apply(df2, 1, look_countries,df_row) #look for an IPv4
+#    if(tmp != FALSE){
+#      df_row[[3]] <- tmp
+#    }
+#  }
+#  else {
+#    tmp <- apply(df2, 1, look_countries2,df_row) #look for ranges
+#    if(tmp != FALSE){
+#      df_row[[3]] <- tmp
+#    }
+#  }
 }
 
 #' This function merges the 2 dataframes in order to apply the location from countries' data frame to each IP from IPs.
@@ -189,8 +198,7 @@ ips_merge <- function(df_row,df2){
 #'
 #' @examples
 mergeDFs2 <- function (df,df2){
-  final_df <- apply(df,1,ips_merge,df2)
-  return(final_df)
+  apply(df,1,ips_merge,df2)
 }
 
 #' This function merges the 2 dataframes in order to apply the location from countries to each IP from ips
