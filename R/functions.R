@@ -162,19 +162,23 @@ look_countries <- function(df2, df_row){
 #' @export
 #'
 ips_merge <- function(df_row,df2){
-  if(iptools::is_ipv4(df_row[1])){
+  if(iptools::is_ipv4(df_row[[1]])){
     for (i in 1:nrow(df2)) {
       df2_row <- df2[i,]
-      if(iptools::ip_in_range(df_row[[1]],df2_row[1])){
+      if(iptools::ip_in_range(df_row[[1]],df2_row[[1]])){
         #location found
-        print(df2_row[4])
+        #print(df2_row[4])
         df_row[3] <- df2_row[4]
         break
       }
     }
-  } else{
+  } 
+  else{
     df_row[3] <- Unknown
   }
+  return (df_row[3])
+}
+
 #  if(iptools::is_ipv4(df_row[1])){
 #    tmp <- apply(df2, 1, look_countries,df_row) #look for an IPv4
 #    if(tmp != FALSE){
@@ -200,7 +204,12 @@ ips_merge <- function(df_row,df2){
 #'
 #' @examples
 mergeDFs2 <- function (df,df2){
-  apply(df,1,ips_merge,df2)
+  #This solution is a bad one, because of the use of the for (we have to change it to apply method)
+  for (i in 1:nrow(df){
+    df[i,][3] <- ips_merge(df[i,], df2)
+  }
+  
+  #apply(df,1,ips_merge,df2)
 }
 
 #' This function merges the 2 dataframes in order to apply the location from countries to each IP from ips
@@ -235,7 +244,7 @@ mergeDFs <- function(df,df2){
 }
 
 
-#' A l'introduir una IP retorna la quantitat d'atacs rebuts
+#' Return attack recount of an IP
 #'
 #' @param ip
 #'
@@ -245,13 +254,12 @@ mergeDFs <- function(df,df2){
 #' @examples
 #' IPsRecount <- list.ip.count('5.188.86.174')
 list.ip.count <- function(ip){
-  IPsFound <- IPS[IPS$ip == ip,]
+  IPsFound <- df[df$ip == ip,]
 
   return(sum(duplicated(IPsFound$ip)) + 1)
 }
 
-#' A l'introduir una IP mostra el dataset dels atacs que ha rebut
-#' classificada pel tipus de campanya i pais
+#' Show a dataset with a recount of attacks and countries of a selected IP
 #'
 #' @param ip
 #'
@@ -261,7 +269,7 @@ list.ip.count <- function(ip){
 #' @examples
 #' IPRelatedDataset <- list.iprelated.dataset('5.188.86.174')
 list.iprelated.dataset <- function(ip){
-  IPsFound <- IPS[IPS$ip == ip,]
+  IPsFound <- df[df$ip == ip,]
 
   count <- plyr::count(IPsFound)
   colnames(count)[4] <- "appearances"
@@ -269,7 +277,7 @@ list.iprelated.dataset <- function(ip){
 }
 
 
-#' Mostra totes les categories que hi ha registrades
+#' Return all registered categories
 #'
 #'@param IPS
 #'
@@ -278,11 +286,11 @@ list.iprelated.dataset <- function(ip){
 #'
 #' @examples
 #' ListCategories <- list.category()
-list.category <- function(IPS){
-  return(dplyr::distinct(IPS[2]))
+list.category <- function(){
+  return(dplyr::distinct(df[2]))
 }
 
-#' Retorna un dataset de quants atacs per categoria hi ha registrats
+#' Return recount of registered attacks per category
 #'
 #' @param IPS
 #'
@@ -292,12 +300,12 @@ list.category <- function(IPS){
 #'
 #' @examples
 #' CategoriesCount <- list.category.count()
-list.category.count <- function(IPS){
-  return(as.data.frame(table(IPS[2])))
+list.category.count <- function(){
+  return(as.data.frame(table(df[2])))
 }
 
 
-#' Retorna un llistat dels països que tenen IPs que han sigut víctimes d'atacs
+#' Return a countries's list with victims's IPs that have been attacked
 #'
 #' @param IPS
 #'
@@ -307,11 +315,11 @@ list.category.count <- function(IPS){
 #' @examples
 #' ListCountries <- list.country()
 list.country <- function(){
-  return (dplyr::distinct(IPS[3]))
+  return (dplyr::distinct(df[3]))
 }
 
 
-#' Retorna un dataset de quants atacs per país hi ha registrats
+#' Return dataset of recount of attacks registered for country
 #'
 #' @param IPS
 #'
@@ -319,8 +327,8 @@ list.country <- function(){
 #' @export
 #'
 #' @examples
-#' list.category.count(IPS)
-list.country.count <- function(IPS){
-  return (table(IPS[3]))
+#' list.category.count()
+list.country.count <- function(){
+  return (table(df[3]))
 }
 
