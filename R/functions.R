@@ -14,7 +14,7 @@ downloadFireHolData <- function(save.path = mytempfolder) {
   utils::unzip(zipfile = paste(save.path, "\\", "master.zip", sep = ""),
                exdir = paste(save.path, "\\", ".", sep = ""))
   return(paste(save.path, "\\", "data", sep = ""))
-  
+
 }
 #' Says Hello before the user start downloading everything
 #'
@@ -23,16 +23,14 @@ downloadFireHolData <- function(save.path = mytempfolder) {
 #' @export
 #'
 #' @examples
-#' 
+#'
 MessageDownloader <- function(){
   print("Now the download will start, please be patient since it might take up to 2 minuts")
   downloadFireHolData()
   file.remove("master.zip")
-  
   print("Download complete, thanks you for waiting")
 }
 
-MessageDownloader()
 #' GetDataFrame
 #'
 #'
@@ -49,10 +47,6 @@ getDataFrame <- function() {
   return(IPS)
 }
 
-getDataFrame()
-
-
-
 #' This function creates a data frame with all the malicious IPs from the downloaded sources
 #'
 #' @param working.directory
@@ -61,20 +55,18 @@ getDataFrame()
 #' @export
 #'
 #' @examples
-tidyDataIPs <- function(working.directory = mytempfoldertidyData) {
-  mytempfoldertidyData <<- paste (tempdir(),"blocklist-ipsets-master\\",sep = "\\",collapse = NULL)
-  src.files <- list.files(path = mytempfoldertidyData, pattern = ".ipset")
+tidyDataIPs <- function(raw.path) {
+  src.files <- list.files(path = raw.path, pattern = ".ipset")
   ips <- data.frame(ip = character(),
                     categ = character(),
                     country = character(),
                     stringsAsFactors = F)
-  
   # file_name <- src.files[1]
   for (file_name in src.files){
-    tmp <- read.table(file = paste(mytempfoldertidyData, file_name, sep = ""), skipNul = T,
+    tmp <- read.table(file = paste(raw.path, file_name, sep = ""), skipNul = T,
                       col.names = c("ip"), na.strings = "NULL", stringsAsFactors = F)
     if (nrow(tmp) > 0) {
-      file_info <- read.table(file = paste(mytempfoldertidyData, file_name, sep = ""),
+      file_info <- read.table(file = paste(raw.path, file_name, sep = ""),
                               comment.char="/", sep = "\t", quote = "", stringsAsFactors = F, nrows=50 )
       categ <- dplyr::filter(file_info, stringr::str_detect(V1,"Category"))
       if(nrow(categ) > 0) {
@@ -96,19 +88,21 @@ tidyDataIPs <- function(working.directory = mytempfoldertidyData) {
 #' @export
 #'
 #' @examples
-tidyDataCountries <- function (working.directory = mytempfoldertidyCountry) {
-  mytempfoldertidyCountry <<- paste (tempdir(),"blocklist-ipsets-master\\geolite2_country\\",sep = "\\",collapse = NULL)
-  mierdola <- dir(path = mytempfoldertidyCountry, pattern="..\\continent_")
-  file.remove(mierdola)
-  src.files <- list.files(path = mytempfoldertidyCountry, pattern = ".netset" )
+tidyDataCountries <- function (raw.path) {
+  # raw.path <- "data/geolite2_country/"
+  raw.path <- paste(path.raw.data, "geolite2_country", sep="")
+  raw.path <- paste(raw.path, "\\", sep="")
+  temporary <- dir(path = raw.path, pattern="..\\continent_")
+  file.remove(temporary)
+  src.files <- list.files(path = raw.path, pattern = ".netset" )
   countries <- NULL
 
   for (file_name in src.files){
-    file_info <- read.table(file = paste(mytempfoldertidyCountry, file_name, sep = ""),
+    file_info <- read.table(file = paste(raw.path, file_name, sep = ""),
                             comment.char="/", sep = "\t", stringsAsFactors = F,
                             nrows = 50, row.names = NULL)
     country_tmp <- dplyr::filter(file_info, stringr::str_detect(V1,"--"))
-    tmp2 <- read.table(file = paste(mytempfoldertidyCountry, file_name, sep = ""),
+    tmp2 <- read.table(file = paste(raw.path, file_name, sep = ""),
                        skipNul = T, na.strings = "NULL", col.names = c("range"),
                        stringsAsFactors = F, row.names= NULL)
 
@@ -154,12 +148,8 @@ look_countries2 <- function(df2, df_row){
 #'
 #' @examples
 look_countries <- function(df2, df_row){
-  #print("okay, here's what I got:")
-  #print(df2)
   temp <- iptools::ip_in_range(df_row[1], df2[1])
-  #print(temp)
   if (temp){
-    #print("EUREKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
     return(df2[4])
   }else {
     return(FALSE)
@@ -187,7 +177,18 @@ ips_merge <- function(df_row,df2){
   } else{
     df_row[3] <- Unknown
   }
-
+#  if(iptools::is_ipv4(df_row[1])){
+#    tmp <- apply(df2, 1, look_countries,df_row) #look for an IPv4
+#    if(tmp != FALSE){
+#      df_row[[3]] <- tmp
+#    }
+#  }
+#  else {
+#    tmp <- apply(df2, 1, look_countries2,df_row) #look for ranges
+#    if(tmp != FALSE){
+#      df_row[[3]] <- tmp
+#    }
+#  }
 }
 
 #' This function merges the 2 dataframes in order to apply the location from countries' data frame to each IP from IPs.
@@ -325,18 +326,3 @@ list.country.count <- function(IPS){
   return (table(IPS[3]))
 }
 
-#' Help Menu()
-#'
-#'
-#' @return help
-#' @export
-#'
-#' @examples
-help <- function(){
-  return(
-  print("The following commands are available for use:"),
-  print("MessageDownloader() to download the latest data"),
-  print("getDataFrame() which is quite useless at the moment"),
-  print("help which shows you this menu")
-  )
-}
