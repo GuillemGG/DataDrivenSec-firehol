@@ -2,15 +2,11 @@
 title: "Thread Analisys"
 author: "J.P.G."
 date: "Summer 2018"
-output:
-  html_document:
-    toc: yes
-  html_notebook:
-    highlight: pygments
-    number_sections: yes
-    theme: spacelab
-    toc: yes
-    toc_float: no
+Developers:
+  Guillem G.:
+  Pol S.:
+Writer:
+  Jeffrey M.:
 ---
 
 ```{r}
@@ -21,33 +17,50 @@ library(DataDrivenSecFirehol)
 Threat intel based on firehol's IP lists
 =============================
 
-Descargamos y descomprimimos los datos de Firehol, este proceso puede tardar un poco.
+## About this repo
+
+This package will be an extra tool to any one searching data from an IP that was part of an intrusion, a DoS or other kind of attaks ...
+
+The program is initiated with `DataDrivenSecFirehol()`.
+Functions which control DDSFirehol's behavior include `bye()` to quit and `help()` to prompt a help menu.
+
+The data source we extract information from was:
+[firehol](https://github.com/firehol/firehol)
+
+## Hands-On 
+
+First of all lets download the data and unzip them. The process might take a while so hold on.
 ```{r}
 path.raw.data <- DataDrivenSecFirehol::downloadFireHolData()
 path.raw.data <- paste(path.raw.data, "blocklist-ipsets-master", sep="\\")
 path.raw.data <- paste(path.raw.data, "\\", sep="")
 ```
-El contenido está en `r path.raw.data`. Es un fichero temporal que se eliminará cuando cierres la sesión.
+The data will be in `r path.raw.data`. It's a temporary file that will be deleted once you finish the session.
 
-A continuación, vamos a proceder a parsear los datos anteriores y a generar el data frame ordenado. 
+Let's proceed with the parsing and creation of a sorted data-frame.
 
 ```{r}
 df <- DataDrivenSecFirehol::tidyDataIPs(raw.path = path.raw.data)
 ```
 
-Ya tenemos las IPs parseadas, ahora es el turno de la localización por IPs usando la base de datos de maxmind. Primero, debes eliminar los ficheros de IPs de continentes para no tener duplicados y obtener solo la de los países.
-TODO: eliminar esos ficheros al descargarlos
+
+Since all the IPs has been parsed, let's do the same for the geolocation of the IPs; for that we will use maxmind
+Frist of all remove the IPs of the continents in order to don't duplicate data and keep just the required information.
 
 ```{r}
 df2 <- DataDrivenSecFirehol::tidyDataCountries(raw.path = path.raw.data)
 ```
 
-Una vez tenemos los dos data frames construidos y a punto, procedemos a fusionarlos para tener todo el contenido en un mismo dataframe.
+Once both frames are builded and ready, let's merge them since a bigger dataframe will be able to handle all the data.
 
 ```{r}
 df_final <- DataDrivenSecFirehol::mergeDFs2(df,df2)
 ```
 
-Ahora, os aconsejo probar algunos ejemplos como los de continuación:
+## Using the functions 
+Use `help()`to see the available functions
+## License
 
-JEFFREY COMPLETA PLIS...
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
