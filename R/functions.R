@@ -8,7 +8,7 @@ setwd(mytempfolder)
 #' @export
 #'
 #' @examples
-downloadFireHolData <- function(save.path = mytempfolder) {
+downloadFireHolData <- function(save.path = tempdir()) {
   download.file(url = "https://github.com/firehol/blocklist-ipsets/archive/master.zip",
                 destfile = paste(save.path, "\\", "master.zip", sep = ""))
   utils::unzip(zipfile = paste(save.path, "\\", "master.zip", sep = ""),
