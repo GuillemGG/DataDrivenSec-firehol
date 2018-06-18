@@ -1,6 +1,3 @@
-mytempfolder <- tempdir()
-setwd(mytempfolder)
-
 #' Downloads data from scratch.
 #'
 #' @param save.path
@@ -16,6 +13,7 @@ downloadFireHolData <- function(save.path = tempdir()) {
   return(paste(save.path, "\\", "data", sep = ""))
 
 }
+
 #' Says Hello before the user start downloading everything
 #'
 #' @return MessageDownloader
