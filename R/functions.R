@@ -1,4 +1,38 @@
+mytempfolder <- tempdir()
+setwd(mytempfolder)
 
+#' Downloads data from scratch.
+#'
+#' @param save.path
+#'
+#' @export
+#'
+#' @examples
+downloadFireHolData <- function(save.path = mytempfolder) {
+  download.file(url = "https://github.com/firehol/blocklist-ipsets/archive/master.zip",
+                destfile = paste(save.path, "\\", "master.zip", sep = ""))
+  utils::unzip(zipfile = paste(save.path, "\\", "master.zip", sep = ""),
+               exdir = paste(save.path, "\\", ".", sep = ""))
+  return(paste(save.path, "\\", "data", sep = ""))
+  
+}
+#' Says Hello before the user start downloading everything
+#'
+#' @return MessageDownloader
+#'
+#' @export
+#'
+#' @examples
+#' 
+MessageDownloader <- function(){
+  print("Now the download will start, please be patient since it might take up to 2 minuts")
+  downloadFireHolData()
+  file.remove("master.zip")
+  
+  print("Download complete, thanks you for waiting")
+}
+
+MessageDownloader()
 #' GetDataFrame
 #'
 #'
@@ -9,29 +43,14 @@
 #' @examples
 getDataFrame <- function() {
   IPS <- data.frame(ip = character(),
-                   categoria = character(),
-                   pais = character(),
-                   stringsAsFactors = F)
-  print(save.path)
+                    categoria = character(),
+                    pais = character(),
+                    stringsAsFactors = F)
   return(IPS)
 }
 
+getDataFrame()
 
-#' Downloads data from scratch.
-#'
-#' @param save.path
-#'
-#' @export
-#'
-#' @examples
-downloadFireHolData <- function(save.path = tempdir()) {
-  download.file(url = "https://github.com/firehol/blocklist-ipsets/archive/master.zip",
-                destfile = paste(save.path, "\\", "master.zip", sep = ""))
-  utils::unzip(zipfile = paste(save.path, "\\", "master.zip", sep = ""),
-               exdir = paste(save.path, "\\", "data", sep = ""))
-  #TODO: ELIMINAR FITXERS CONTINENT DINS DE GEOIP2 I QUADRAR PATHS
-  return(paste(save.path, "\\", "data", sep = ""))
-}
 
 
 #' This function creates a data frame with all the malicious IPs from the downloaded sources
@@ -42,19 +61,20 @@ downloadFireHolData <- function(save.path = tempdir()) {
 #' @export
 #'
 #' @examples
-tidyDataIPs <- function(raw.path) {
-  src.files <- list.files(path = raw.path, pattern = ".ipset")
+tidyDataIPs <- function(working.directory = mytempfoldertidyData) {
+  mytempfoldertidyData <<- paste (tempdir(),"blocklist-ipsets-master\\",sep = "\\",collapse = NULL)
+  src.files <- list.files(path = mytempfoldertidyData, pattern = ".ipset")
   ips <- data.frame(ip = character(),
                     categ = character(),
                     country = character(),
                     stringsAsFactors = F)
-
+  
   # file_name <- src.files[1]
   for (file_name in src.files){
-    tmp <- read.table(file = paste(raw.path, file_name, sep = ""), skipNul = T,
+    tmp <- read.table(file = paste(mytempfoldertidyData, file_name, sep = ""), skipNul = T,
                       col.names = c("ip"), na.strings = "NULL", stringsAsFactors = F)
     if (nrow(tmp) > 0) {
-      file_info <- read.table(file = paste(raw.path, file_name, sep = ""),
+      file_info <- read.table(file = paste(mytempfoldertidyData, file_name, sep = ""),
                               comment.char="/", sep = "\t", quote = "", stringsAsFactors = F, nrows=50 )
       categ <- dplyr::filter(file_info, stringr::str_detect(V1,"Category"))
       if(nrow(categ) > 0) {
@@ -68,7 +88,6 @@ tidyDataIPs <- function(raw.path) {
   return(ips)
 }
 
-
 #' This method collects data from the downloaded source and creates a data frame matching IP ranges and countries.
 #'
 #' @param working.directory
@@ -77,25 +96,21 @@ tidyDataIPs <- function(raw.path) {
 #' @export
 #'
 #' @examples
-tidyDataCountries <- function(raw.path) {
-  # raw.path <- "data/geolite2_country/"
-  raw.path <- paste(path.raw.data, "geolite2_country", sep="")
-  raw.path <- paste(raw.path, "\\", sep="")
-  #TODO: S'HA D'ELIMINAR ELS FITXERS CONTINENT I ANONYMOUS.
-  src.files <- list.files(path = raw.path, pattern = ".netset")
+tidyDataCountries <- function (working.directory = mytempfoldertidyCountry) {
+  mytempfoldertidyCountry <<- paste (tempdir(),"blocklist-ipsets-master\\geolite2_country\\",sep = "\\",collapse = NULL)
+  mierdola <- dir(path = mytempfoldertidyCountry, pattern="..\\continent_")
+  file.remove(mierdola)
+  src.files <- list.files(path = mytempfoldertidyCountry, pattern = ".netset" )
   countries <- NULL
 
   for (file_name in src.files){
-    file_info <- read.table(file = paste(raw.path, file_name, sep = ""),
+    file_info <- read.table(file = paste(mytempfoldertidyCountry, file_name, sep = ""),
                             comment.char="/", sep = "\t", stringsAsFactors = F,
                             nrows = 50, row.names = NULL)
     country_tmp <- dplyr::filter(file_info, stringr::str_detect(V1,"--"))
-    tmp2 <- read.table(file = paste(raw.path, file_name, sep = ""),
+    tmp2 <- read.table(file = paste(mytempfoldertidyCountry, file_name, sep = ""),
                        skipNul = T, na.strings = "NULL", col.names = c("range"),
                        stringsAsFactors = F, row.names= NULL)
-
-    #sonip <- tmp2[sapply(tmp2$range, iptools::is_ipv4),]
-    #nosonip <- tmp2[!sapply(tmp2$range, iptools::is_ipv4),]
 
     for (ip in tmp2) {
       tmp_boundary <- iptools::range_boundaries(ip)
@@ -173,18 +188,6 @@ ips_merge <- function(df_row,df2){
     df_row[3] <- Unknown
   }
 
-#  if(iptools::is_ipv4(df_row[1])){
-#    tmp <- apply(df2, 1, look_countries,df_row) #look for an IPv4
-#    if(tmp != FALSE){
-#      df_row[[3]] <- tmp
-#    }
-#  }
-#  else {
-#    tmp <- apply(df2, 1, look_countries2,df_row) #look for ranges
-#    if(tmp != FALSE){
-#      df_row[[3]] <- tmp
-#    }
-#  }
 }
 
 #' This function merges the 2 dataframes in order to apply the location from countries' data frame to each IP from IPs.
@@ -322,3 +325,18 @@ list.country.count <- function(IPS){
   return (table(IPS[3]))
 }
 
+#' Help Menu()
+#'
+#'
+#' @return help
+#' @export
+#'
+#' @examples
+help <- function(){
+  return(
+  print("The following commands are available for use:"),
+  print("MessageDownloader() to download the latest data"),
+  print("getDataFrame() which is quite useless at the moment"),
+  print("help which shows you this menu")
+  )
+}
